@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2026-08-21T19:53:37.881Z",
+  "period": "daily",
+  "start": "2026-08-21T00:00:00.000Z",
+  "signals": 0,
+  "health": {
+    "total": 0,
+    "wins": 0,
+    "losses": 0,
+    "winRate": null,
+    "totalPips": 0,
+    "posteriorWinRate": 0.5,
+    "note": "Bayesian posterior mean; not a guaranteed forecast."
+  },
+  "byPair": {
+    "EUR/USD": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "GBP/USD": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "USD/JPY": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "USD/CHF": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "AUD/USD": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "USD/CAD": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "NZD/USD": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "EUR/GBP": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "EUR/JPY": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "GBP/JPY": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "AUD/JPY": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    },
+    "EUR/AUD": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": null,
+      "totalPips": 0,
+      "posteriorWinRate": 0.5,
+      "note": "Bayesian posterior mean; not a guaranteed forecast."
+    }
+  }
+}
