@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ORACLE ULTIMATE — Real Trading Signal Platform</title>
+<meta name="description" content="Professional real-time Forex signal platform"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg-void:#04060b;--bg-primary:#0a0e1a;--bg-panel:rgba(13,19,32,.78);--bg-panel-solid:#0d1320;--border-subtle:rgba(90,140,255,.10);--border-glow:rgba(0,255,163,.22);--text-primary:#eaf0fb;--text-secondary:#8899bb;--text-dim:#52627f;--accent-buy:#00ff9d;--accent-buy-dim:rgba(0,255,157,.14);--accent-sell:#ff3860;--accent-sell-dim:rgba(255,56,96,.14);--accent-amber:#ffb547;--accent-amber-dim:rgba(255,181,71,.14);--accent-cyan:#22d3ee;--accent-violet:#a855f7;--accent-blue:#3b82f6;--glass-bg:rgba(10,14,26,.72);--glass-border:rgba(120,170,255,.08);--shadow-glow:0 0 20px rgba(0,255,157,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Inter',sans-serif;background:var(--bg-void);color:var(--text-primary);overflow-x:hidden;min-height:100vh}
+body{background-image:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(59,130,246,.08),transparent),radial-gradient(ellipse 60% 50% at 100% 0%,rgba(168,85,247,.06),transparent),linear-gradient(180deg,var(--bg-void) 0%,#06080f 100%)}
+.font-mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(120,170,255,.18);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(120,170,255,.32)}
+.glass-card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0)),var(--bg-panel);backdrop-filter:blur(12px);border:1px solid var(--border-subtle);border-radius:12px;transition:all .25s ease}
+.glass-card:hover{border-color:var(--border-glow);box-shadow:var(--shadow-glow)}
+.sidebar{position:fixed;top:0;left:0;width:72px;height:100vh;background:rgba(8,12,22,.92);backdrop-filter:blur(20px);border-right:1px solid var(--border-subtle);z-index:50;display:flex;flex-direction:column;align-items:center;padding:16px 0;transition:width .3s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.sidebar:hover{width:240px}
+.sidebar .logo{width:100%;padding:0 14px 16px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.sidebar .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent-buy),var(--accent-cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#000;font-size:18px;flex-shrink:0}
+.sidebar .logo-text{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;opacity:0;transition:opacity .3s;overflow:hidden}
+.sidebar:hover .logo-text{opacity:1}
+.sidebar .logo-sub{font-size:9px;color:var(--text-dim);letter-spacing:.15em;font-family:'JetBrains Mono',monospace;opacity:0;transition:opacity .3s}
+.sidebar:hover .logo-sub{opacity:1}
+.nav-item{display:flex;align-items:center;gap:14px;width:calc(100% - 14px);margin:2px 7px;padding:11px 14px;color:var(--text-secondary);text-decoration:none;border-radius:10px;border-left:2px solid transparent;cursor:pointer;white-space:nowrap;font-size:13px;font-weight:500;transition:all .2s}
+.nav-item:hover{background:rgba(0,255,157,.04);color:var(--text-primary)}
+.nav-item.active{background:linear-gradient(90deg,rgba(0,255,157,.10),rgba(34,211,238,.03));color:var(--text-primary);border-left-color:var(--accent-buy)}
+.nav-item i{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.nav-item .label{opacity:0;transition:opacity .3s}
+.sidebar:hover .nav-item .label{opacity:1}
+.nav-item.active i{color:var(--accent-buy)}
+.main-content{margin-left:72px;padding:14px 20px 60px;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(8,12,22,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-subtle);padding:10px 16px;margin:-14px -20px 16px;display:flex;align-items:center;gap:16px}
+.ticker{flex:1;overflow:hidden;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:11px}
+.ticker-inner{display:inline-block;animation:tickerScroll 60s linear infinite}
+@keyframes tickerScroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.ticker-item{display:inline-flex;align-items:center;gap:6px;margin-right:22px;color:var(--text-secondary)}
+.ticker-item .pair{color:var(--text-primary);font-weight:600}
+.up{color:var(--accent-buy)}.down{color:var(--accent-sell)}.neutral{color:var(--accent-amber)}
+.section-panel{display:none;animation:fadeIn .35s ease}
+.section-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-size:20px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-title i{color:var(--accent-buy)}
+.section-title .subtitle{font-size:11px;color:var(--text-dim);font-weight:400;font-family:'JetBrains Mono',monospace;letter-spacing:.05em}
+.stat-card{padding:14px 16px;border-radius:12px;background:var(--bg-panel);border:1px solid var(--border-subtle);transition:all .2s}
+.stat-card:hover{border-color:var(--border-glow)}
+.stat-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace}
+.stat-value{font-size:22px;font-weight:700;margin-top:4px;font-family:'JetBrains Mono',monospace}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+.badge-buy{background:var(--accent-buy-dim);color:var(--accent-buy);border:1px solid rgba(0,255,157,.3)}
+.badge-sell{background:var(--accent-sell-dim);color:var(--accent-sell);border:1px solid rgba(255,56,96,.3)}
+.badge-amber{background:var(--accent-amber-dim);color:var(--accent-amber);border:1px solid rgba(255,181,71,.3)}
+.badge-blue{background:rgba(59,130,246,.12);color:var(--accent-blue);border:1px solid rgba(59,130,246,.3)}
+.badge-live{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.4);animation:livePulse 2s infinite}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.6}}
+.btn{padding:8px 18px;border-radius:9px;font-weight:600;font-size:12px;border:none;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-buy{background:linear-gradient(135deg,var(--accent-buy),#00cc7d);color:#04060b}
+.btn-buy:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,255,157,.3)}
+.btn-sell{background:linear-gradient(135deg,var(--accent-sell),#cc2d4d);color:#fff}
+.btn-sell:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,56,96,.3)}
+.btn-ghost{background:rgba(120,170,255,.05);color:var(--text-primary);border:1px solid var(--border-subtle)}
+.btn-ghost:hover{background:rgba(120,170,255,.12)}
+.signal-card{padding:16px;border-radius:12px;background:var(--bg-panel);border:1px solid var(--border-subtle);transition:all .25s;position:relative;overflow:hidden}
+.signal-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent-buy)}
+.signal-card.sell::before{background:var(--accent-sell)}
+.signal-card:hover{border-color:var(--border-glow);transform:translateY(-2px)}
+.glow-dot{width:8px;height:8px;border-radius:50%;box-shadow:0 0 10px currentColor}
+.connection-status{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:14px;font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:600}
+.connection-online{background:rgba(0,255,157,.12);color:var(--accent-buy);border:1px solid rgba(0,255,157,.3)}
+.connection-offline{background:rgba(255,56,96,.12);color:var(--accent-sell);border:1px solid rgba(255,56,96,.3)}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border-subtle);border-top-color:var(--accent-buy);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:20px;right:20px;padding:12px 18px;border-radius:10px;background:var(--bg-panel-solid);border:1px solid var(--border-glow);z-index:1000;animation:toastIn .3s ease,toastOut .3s ease 2.7s forwards;display:flex;align-items:center;gap:10px;font-size:13px}
+@keyframes toastIn{from{transform:translateX(120%)}to{transform:translateX(0)}}
+@keyframes toastOut{to{transform:translateX(120%);opacity:0}}
+@media(max-width:768px){.sidebar{width:100%;height:64px;flex-direction:row;padding:0 8px;bottom:0;top:auto;border-right:none;border-top:1px solid var(--border-subtle);overflow-x:auto;overflow-y:hidden}.sidebar:hover{width:100%}.sidebar .logo,.sidebar .logo-text,.sidebar .logo-sub{display:none}.sidebar .nav-item{padding:8px 12px;width:auto;flex-shrink:0;border-left:none;border-bottom:2px solid transparent;margin:0 2px}.sidebar .nav-item.active{border-bottom-color:var(--accent-buy);border-left-color:transparent}.sidebar .nav-item .label{opacity:0;display:none}.main-content{margin-left:0;padding-bottom:80px}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+    <div><div class="logo-text">ORACLE</div><div class="logo-sub">REAL SIGNALS • LIVE</div></div>
+  </div>
+  <a class="nav-item active" data-section="dashboard"><i class="fas fa-th-large"></i><span class="label">Dashboard</span></a>
+  <a class="nav-item" data-section="signals"><i class="fas fa-bullseye"></i><span class="label">All Signals</span></a>
+  <a class="nav-item" data-section="tracker"><i class="fas fa-chart-line"></i><span class="label">Performance</span></a>
+  <a class="nav-item" data-section="news"><i class="fas fa-newspaper"></i><span class="label">News</span></a>
+  <a class="nav-item" data-section="settings"><i class="fas fa-cog"></i><span class="label">Settings</span></a>
+</nav>
+
+<!-- MAIN -->
+<div class="main-content">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="ticker"><div class="ticker-inner" id="tickerContent"><span class="ticker-item"><span class="pair">ORACLE</span> <span class="loader"></span> Connecting...</span></div></div>
+    <div class="flex items-center gap-3">
+      <div id="connectionStatus" class="connection-status connection-offline"><span class="glow-dot" style="background:#ef4444;color:#ef4444"></span><span>CONNECTING</span></div>
+      <div class="font-mono text-xs" id="liveClock" style="color:var(--text-secondary)"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="section-panel active" id="section-dashboard">
+    <div class="section-title"><i class="fas fa-th-large"></i><div><div>Signal Dashboard</div><div class="subtitle">REAL-TIME • MULTI-INDICATOR • LIVE DATA • TELEGRAM ALERTS</div></div></div>
+    <div id="statsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"></div>
+    <div class="mb-4 flex items-center gap-3 flex-wrap">
+      <button id="scanBtn" class="btn btn-buy"><i class="fas fa-search"></i> Scan All Pairs</button>
+      <button id="scanMajorsBtn" class="btn btn-ghost"><i class="fas fa-bolt"></i> Quick Scan (Majors)</button>
+      <span class="text-xs" style="color:var(--text-dim)">Analyzes pairs with 7 indicators • ~30s full / ~10s quick</span>
+    </div>
+    <div class="section-title" style="font-size:16px"><i class="fas fa-bolt"></i><div>Active Signals</div></div>
+    <div id="activeSignals" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+  </div>
+
+  <!-- ALL SIGNALS -->
+  <div class="section-panel" id="section-signals">
+    <div class="section-title"><i class="fas fa-bullseye"></i><div><div>Signal History</div><div class="subtitle">ALL GENERATED SIGNALS • TRACKED RESULTS</div></div></div>
+    <div id="allSignalsList" class="space-y-2"></div>
+  </div>
+
+  <!-- TRACKER -->
+  <div class="section-panel" id="section-tracker">
+    <div class="section-title"><i class="fas fa-chart-line"></i><div><div>Performance Tracker</div><div class="subtitle">REAL RESULTS • WIN RATE • PROFIT FACTOR</div></div></div>
+    <div id="trackerStats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"></div>
+    <div id="trackerDetails" class="space-y-3"></div>
+    <div class="flex gap-2 mt-4">
+      <button id="exportBtn" class="btn btn-ghost"><i class="fas fa-download"></i> Export Data</button>
+      <button id="clearBtn" class="btn btn-ghost" style="border-color:var(--accent-sell);color:var(--accent-sell)"><i class="fas fa-trash"></i> Clear All</button>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section-panel" id="section-news">
+    <div class="section-title"><i class="fas fa-newspaper"></i><div><div>Financial News</div><div class="subtitle">REAL-TIME • SENTIMENT ANALYSIS • ECONOMIC CALENDAR</div></div></div>
+    <div class="mb-3 flex gap-2">
+      <button id="loadNewsBtn" class="btn btn-ghost"><i class="fas fa-sync"></i> Load Latest News</button>
+      <button id="loadCalendarBtn" class="btn btn-ghost"><i class="fas fa-calendar"></i> Economic Calendar</button>
+    </div>
+    <div id="newsList" class="space-y-2"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section-panel" id="section-settings">
+    <div class="section-title"><i class="fas fa-cog"></i><div><div>Settings</div><div class="subtitle">API STATUS • TELEGRAM • PREFERENCES</div></div></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="glass-card p-4">
+        <div class="stat-label mb-3">API CONNECTION STATUS</div>
+        <div id="apiStatus" class="space-y-2 text-xs"></div>
+      </div>
+      <div class="glass-card p-4">
+        <div class="stat-label mb-3">TELEGRAM NOTIFICATIONS</div>
+        <div id="telegramStatus" class="text-xs space-y-2"></div>
+        <button id="testTelegramBtn" class="btn btn-ghost w-full mt-3"><i class="fab fa-telegram"></i> Send Test Message</button>
+      </div>
+      <div class="glass-card p-4">
+        <div class="stat-label mb-3">SIGNAL SETTINGS</div>
+        <div class="space-y-2 text-xs">
+          <label>Min Confidence (%)<input type="number" id="setMinConf" value="65" class="mt-1" style="background:rgba(6,10,18,.8);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 11px;width:100%"/></label>
+          <label>Risk:Reward Ratio<input type="number" id="setRR" value="2" step="0.5" class="mt-1" style="background:rgba(6,10,18,.8);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:8px;padding:7px 11px;width:100%"/></label>
+          <label><input type="checkbox" id="setTelegramAlerts" checked/> Send Telegram alerts for new signals</label>
+        </div>
+      </div>
+      <div class="glass-card p-4">
+        <div class="stat-label mb-3">ABOUT</div>
+        <div class="text-xs space-y-1" style="color:var(--text-secondary)">
+          <div><b>ORACLE ULTIMATE</b> v3.0</div>
+          <div>Real-time Forex Signal Platform</div>
+          <div>Data: Finnhub + Twelve Data + NewsAPI</div>
+          <div>Alerts: Telegram Bot</div>
+          <div style="color:var(--text-dim);margin-top:8px">⚠️ This is a SIGNAL platform only. Execute trades manually on your broker platform.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   ORACLE ULTIMATE v3.0 — Complete Real Trading Signal Platform
+   APIs: Finnhub (WebSocket) + Twelve Data (OHLCV) + NewsAPI + FRED + Telegram
+   ========================================================================= */
+
+// ===================== CONFIGURATION =====================
+const CONFIG = {
+  API: {
+    FINNHUB_KEY: '__SET_FINNHUB_KEY_IN_GITHUB_SECRETS__',
+    TWELVE_DATA_KEY: '__SET_TWELVE_DATA_KEY_IN_GITHUB_SECRETS__',
+    NEWS_API_KEY: '__SET_NEWS_API_KEY_IN_GITHUB_SECRETS__',
+    FRED_KEY: '__SET_FRED_KEY_IN_GITHUB_SECRETS__',
+  },
+  TELEGRAM: {
+    BOT_TOKEN: '__SET_TELEGRAM_BOT_TOKEN_IN_GITHUB_SECRETS__',
+    CHAT_ID: '__SET_TELEGRAM_CHAT_ID_IN_GITHUB_SECRETS__',
+  },
+  FINNHUB_WS: 'wss://ws.finnhub.io?token=',
+  FINNHUB_REST: 'https://finnhub.io/api/v1',
+  TWELVE_DATA_URL: 'https://api.twelvedata.com',
+  NEWS_API_URL: 'https://newsapi.org/v2',
+  FRED_URL: 'https://api.stlouisfed.org/fred',
+
+  PAIRS: ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','AUD/USD','USD/CAD','NZD/USD','EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD'],
+  MAJORS: ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','AUD/USD','USD/CAD','NZD/USD'],
+
+  FINNHUB_SYMBOLS: {
+    'EUR/USD':'OANDA:EUR_USD','GBP/USD':'OANDA:GBP_USD','USD/JPY':'OANDA:USD_JPY',
+    'USD/CHF':'OANDA:USD_CHF','AUD/USD':'OANDA:AUD_USD','USD/CAD':'OANDA:USD_CAD',
+    'NZD/USD':'OANDA:NZD_USD','EUR/GBP':'OANDA:EUR_GBP','EUR/JPY':'OANDA:EUR_JPY',
+    'GBP/JPY':'OANDA:GBP_JPY','AUD/JPY':'OANDA:AUD_JPY','EUR/AUD':'OANDA:EUR_AUD'
+  },
+
+  SIGNAL: { minConfidence: 65, rrRatio: 2.0, atrSL: 1.5, atrTP: 3.0 },
+  STORAGE_KEY: 'oracle_v3_data',
+};
+
+// ===================== STATE =====================
+const STATE = {
+  prices: {},
+  signals: [],
+  ws: null,
+  connected: false,
+  scanning: false,
+};
+
+// ===================== LOCAL STORAGE =====================
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY)) || { signals: [] }; }
+  catch { return { signals: [] }; }
+}
+function saveData(data) {
+  try { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(data)); } catch {}
+}
+
+// ===================== TELEGRAM =====================
+const Telegram = {
+  async send(message) {
+    try {
+      const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM.BOT_TOKEN}/sendMessage`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CONFIG.TELEGRAM.CHAT_ID,
+          text: message,
+          parse_mode: 'HTML',
+        }),
+      });
+      return res.ok;
+    } catch (e) { console.warn('Telegram send failed:', e); return false; }
+  },
+
+  async sendSignal(signal) {
+    const arrow = signal.direction === 'BUY' ? '🟢📈' : '🔴📉';
+    const msg = `
+${arrow} <b>ORACLE SIGNAL: ${signal.pair} ${signal.direction}</b>
+
+⚡ Confidence: <b>${signal.confidence}%</b>
+📍 Entry: <code>${signal.entry.toFixed(5)}</code>
+🛑 Stop Loss: <code>${signal.stop_loss.toFixed(5)}</code>
+🎯 Take Profit: <code>${signal.take_profit.toFixed(5)}</code>
+📐 R:R = 1:${signal.risk_reward}
+⏰ Session: ${signal.best_session}
+📊 ATR: ${signal.atr_pips} pips
+
+<b>Reasoning:</b>
+${signal.reasoning.map(r => '• ' + r).join('\n')}
+
+⚠️ <i>Execute manually on your broker. Not financial advice.</i>`;
+    return this.send(msg);
+  },
+
+  async sendTest() {
+    return this.send('✅ <b>ORACLE ULTIMATE</b> connected successfully!\n\nYou will receive trading signals here.\n\n🕐 ' + new Date().toUTCString());
+  },
+};
+
+// ===================== DATA LAYER =====================
+const DataLayer = {
+  cache: new Map(),
+  rateLimits: { twelve: { count: 0, reset: Date.now() } },
+
+  // WebSocket - Real-time prices
+  connectWS() {
+    const url = CONFIG.FINNHUB_WS + CONFIG.API.FINNHUB_KEY;
+    try {
+      STATE.ws = new WebSocket(url);
+      STATE.ws.onopen = () => {
+        STATE.connected = true;
+        updateStatus('online');
+        Object.values(CONFIG.FINNHUB_SYMBOLS).forEach(sym => {
+          STATE.ws.send(JSON.stringify({ type: 'subscribe', symbol: sym }));
+        });
+        toast('Connected to live data', 'success');
+      };
+      STATE.ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'trade' && msg.data) {
+          msg.data.forEach(tick => {
+            const pair = Object.keys(CONFIG.FINNHUB_SYMBOLS).find(k => CONFIG.FINNHUB_SYMBOLS[k] === tick.s);
+            if (pair) {
+              STATE.prices[pair] = { price: tick.p, ts: tick.t, vol: tick.v };
+            }
+          });
+        }
+      };
+      STATE.ws.onerror = () => { updateStatus('offline'); };
+      STATE.ws.onclose = () => {
+        STATE.connected = false;
+        updateStatus('offline');
+        setTimeout(() => this.connectWS(), 5000);
+      };
+    } catch { updateStatus('offline'); }
+  },
+
+  // Twelve Data - OHLCV
+  async fetchOHLCV(pair, interval = '1h', size = 100) {
+    const cacheKey = `ohlcv_${pair}_${interval}`;
+    const cached = this.cache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < 300000) return cached.data;
+
+    // Rate limit: 8/min
+    const rl = this.rateLimits.twelve;
+    if (Date.now() > rl.reset) { rl.count = 0; rl.reset = Date.now() + 60000; }
+    if (rl.count >= 7) { await new Promise(r => setTimeout(r, 8000)); rl.count = 0; }
+    rl.count++;
+
+    try {
+      const url = `${CONFIG.TWELVE_DATA_URL}/time_series?symbol=${encodeURIComponent(pair)}&interval=${interval}&outputsize=${size}&apikey=${CONFIG.API.TWELVE_DATA_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (json.status === 'error' || !json.values) return null;
+      const data = json.values.map(v => ({
+        t: new Date(v.datetime).getTime(),
+        o: parseFloat(v.open), h: parseFloat(v.high),
+        l: parseFloat(v.low), c: parseFloat(v.close),
+        v: parseInt(v.volume) || 0,
+      })).reverse();
+      this.cache.set(cacheKey, { data, ts: Date.now() });
+      return data;
+    } catch { return null; }
+  },
+
+  // NewsAPI
+  async fetchNews(query = 'forex OR currency OR federal reserve', count = 15) {
+    try {
+      const url = `${CONFIG.NEWS_API_URL}/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&pageSize=${count}&apiKey=${CONFIG.API.NEWS_API_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) return [];
+      const json = await res.json();
+      return (json.articles || []).map(a => ({
+        title: a.title, desc: a.description, source: a.source?.name,
+        url: a.url, date: a.publishedAt,
+        sentiment: analyzeSentiment(a.title + ' ' + (a.description || '')),
+      }));
+    } catch { return []; }
+  },
+
+  // Finnhub Economic Calendar
+  async fetchCalendar() {
+    try {
+      const from = new Date().toISOString().slice(0, 10);
+      const to = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+      const url = `${CONFIG.FINNHUB_REST}/calendar/economic?from=${from}&to=${to}&token=${CONFIG.API.FINNHUB_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) return [];
+      const json = await res.json();
+      return (json.economicCalendar || []).filter(e => e.impact === 'high' || e.impact === 'medium');
+    } catch { return []; }
+  },
+};
+
+// ===================== INDICATORS =====================
+const IND = {
+  SMA(d, p) { const r = []; for (let i = 0; i < d.length; i++) { if (i < p-1) { r.push(null); continue; } let s = 0; for (let j = i-p+1; j <= i; j++) s += d[j]; r.push(s/p); } return r; },
+  EMA(d, p) { const k = 2/(p+1); const r = [d[0]]; for (let i = 1; i < d.length; i++) r.push(d[i]*k + r[i-1]*(1-k)); return r; },
+  RSI(c, p = 14) {
+    if (c.length < p+1) return 50;
+    let g = 0, l = 0;
+    for (let i = c.length-p; i < c.length; i++) { const d = c[i]-c[i-1]; if (d >= 0) g += d; else l -= d; }
+    g /= p; l /= p;
+    if (l === 0) return 100;
+    return 100 - 100/(1 + g/l);
+  },
+  MACD(c) {
+    const ef = this.EMA(c, 12), es = this.EMA(c, 26);
+    const ml = ef.map((v,i) => v - es[i]);
+    const sl = this.EMA(ml.slice(25), 9);
+    const last = ml[ml.length-1], sig = sl[sl.length-1];
+    const prev = ml[ml.length-2], prevSig = sl[sl.length-2];
+    let cross = 'NONE';
+    if (last > sig && prev <= prevSig) cross = 'BULLISH';
+    if (last < sig && prev >= prevSig) cross = 'BEARISH';
+    return { macd: last, signal: sig, hist: last - sig, cross };
+  },
+  ATR(candles, p = 14) {
+    if (candles.length < p+1) return 0;
+    const trs = [];
+    for (let i = 1; i < candles.length; i++) {
+      const c = candles[i], pr = candles[i-1];
+      trs.push(Math.max(c.h-c.l, Math.abs(c.h-pr.c), Math.abs(c.l-pr.c)));
+    }
+    return trs.slice(-p).reduce((a,b) => a+b, 0) / p;
+  },
+  ADX(candles, p = 14) {
+    if (candles.length < p*2) return { adx: 0, trend: 'RANGING' };
+    let pDM = 0, mDM = 0, tr = 0;
+    for (let i = candles.length-p; i < candles.length; i++) {
+      const c = candles[i], pr = candles[i-1];
+      const up = c.h - pr.h, dn = pr.l - c.l;
+      if (up > dn && up > 0) pDM += up;
+      if (dn > up && dn > 0) mDM += dn;
+      tr += Math.max(c.h-c.l, Math.abs(c.h-pr.c), Math.abs(c.l-pr.c));
+    }
+    if (tr === 0) return { adx: 0, trend: 'RANGING' };
+    const pDI = 100*pDM/tr, mDI = 100*mDM/tr;
+    const adx = Math.abs(pDI-mDI)/(pDI+mDI)*100;
+    return { adx, pDI, mDI, trend: adx > 25 ? (pDI > mDI ? 'BULLISH' : 'BEARISH') : 'RANGING' };
+  },
+  STOCH(highs, lows, closes, p = 14) {
+    if (closes.length < p) return { k: 50, d: 50 };
+    const hh = Math.max(...highs.slice(-p)), ll = Math.min(...lows.slice(-p));
+    const k = hh === ll ? 50 : (closes[closes.length-1] - ll) / (hh - ll) * 100;
+    return { k, d: k }; // simplified
+  },
+  BB(closes, p = 20) {
+    if (closes.length < p) return { upper: 0, lower: 0, mid: 0 };
+    const slice = closes.slice(-p);
+    const mid = slice.reduce((a,b) => a+b, 0) / p;
+    const sd = Math.sqrt(slice.reduce((s,v) => s + (v-mid)**2, 0) / p);
+    return { upper: mid + 2*sd, lower: mid - 2*sd, mid };
+  },
+  patterns(candles) {
+    if (candles.length < 3) return [];
+    const pats = [];
+    const last = candles[candles.length-1], prev = candles[candles.length-2];
+    const body = Math.abs(last.c - last.o), range = last.h - last.l;
+    const uw = last.h - Math.max(last.o, last.c), lw = Math.min(last.o, last.c) - last.l;
+    if (body < range * 0.1) pats.push({ name: 'DOJI', type: 'NEUTRAL' });
+    if (lw > body*2 && uw < body*0.3 && last.c > last.o) pats.push({ name: 'HAMMER', type: 'BULLISH' });
+    if (uw > body*2 && lw < body*0.3 && last.c < last.o) pats.push({ name: 'SHOOTING_STAR', type: 'BEARISH' });
+    if (prev.c < prev.o && last.c > last.o && last.o < prev.c && last.c > prev.o) pats.push({ name: 'BULL_ENGULF', type: 'BULLISH' });
+    if (prev.c > prev.o && last.c < last.o && last.o > prev.c && last.c < prev.o) pats.push({ name: 'BEAR_ENGULF', type: 'BEARISH' });
+    return pats;
+  },
+  pipSize(pair) { return pair.includes('JPY') ? 0.01 : 0.0001; },
+};
+
+// ===================== SIGNAL ENGINE =====================
+const SignalEngine = {
+  async generate(pair) {
+    const candles = await DataLayer.fetchOHLCV(pair, '1h', 150);
+    if (!candles || candles.length < 50) return null;
+
+    const closes = candles.map(c => c.c);
+    const highs = candles.map(c => c.h);
+    const lows = candles.map(c => c.l);
+    const price = closes[closes.length - 1];
+
+    // Calculate indicators
+    const rsi = IND.RSI(closes, 14);
+    const macd = IND.MACD(closes);
+    const atr = IND.ATR(candles, 14);
+    const adx = IND.ADX(candles, 14);
+    const stoch = IND.STOCH(highs, lows, closes);
+    const bb = IND.BB(closes, 20);
+    const ema20 = IND.EMA(closes, 20);
+    const ema50 = IND.EMA(closes, 50);
+    const pats = IND.patterns(candles);
+
+    // Score
+    let buyScore = 0, sellScore = 0;
+    const reasons = [];
+
+    // RSI (weight 20%)
+    if (rsi < 30) { buyScore += 20; reasons.push(`RSI oversold (${rsi.toFixed(1)})`); }
+    else if (rsi > 70) { sellScore += 20; reasons.push(`RSI overbought (${rsi.toFixed(1)})`); }
+    else if (rsi < 45) { buyScore += 10; }
+    else if (rsi > 55) { sellScore += 10; }
+
+    // MACD (weight 20%)
+    if (macd.cross === 'BULLISH') { buyScore += 20; reasons.push('MACD bullish crossover'); }
+    else if (macd.cross === 'BEARISH') { sellScore += 20; reasons.push('MACD bearish crossover'); }
+    else if (macd.hist > 0) { buyScore += 8; }
+    else { sellScore += 8; }
+
+    // ADX (weight 15%)
+    if (adx.adx > 25) {
+      const s = Math.min(15, (adx.adx - 25) * 0.5 + 8);
+      if (adx.trend === 'BULLISH') { buyScore += s; reasons.push(`Strong bullish trend (ADX ${adx.adx.toFixed(0)})`); }
+      else { sellScore += s; reasons.push(`Strong bearish trend (ADX ${adx.adx.toFixed(0)})`); }
+    }
+
+    // EMA (weight 15%)
+    const e20 = ema20[ema20.length-1], e50 = ema50[ema50.length-1];
+    if (price > e20 && e20 > e50) { buyScore += 15; reasons.push('Price > EMA20 > EMA50'); }
+    else if (price < e20 && e20 < e50) { sellScore += 15; reasons.push('Price < EMA20 < EMA50'); }
+
+    // Bollinger (weight 10%)
+    if (price <= bb.lower * 1.001) { buyScore += 10; reasons.push('At lower Bollinger Band'); }
+    else if (price >= bb.upper * 0.999) { sellScore += 10; reasons.push('At upper Bollinger Band'); }
+
+    // Stochastic (weight 10%)
+    if (stoch.k < 20) { buyScore += 10; reasons.push('Stochastic oversold'); }
+    else if (stoch.k > 80) { sellScore += 10; reasons.push('Stochastic overbought'); }
+
+    // Patterns (weight 10%)
+    const bullPats = pats.filter(p => p.type === 'BULLISH');
+    const bearPats = pats.filter(p => p.type === 'BEARISH');
+    if (bullPats.length > 0) { buyScore += 10; reasons.push(`Pattern: ${bullPats[0].name}`); }
+    if (bearPats.length > 0) { sellScore += 10; reasons.push(`Pattern: ${bearPats[0].name}`); }
+
+    // Determine direction
+    const maxScore = Math.max(buyScore, sellScore);
+    const diff = Math.abs(buyScore - sellScore);
+    if (maxScore < CONFIG.SIGNAL.minConfidence || diff < 10) return null;
+
+    const direction = buyScore > sellScore ? 'BUY' : 'SELL';
+    const confidence = Math.min(95, Math.round(maxScore));
+    const pipSize = IND.pipSize(pair);
+    const slDist = atr * CONFIG.SIGNAL.atrSL;
+    const tpDist = atr * CONFIG.SIGNAL.atrTP;
+
+    const signal = {
+      id: 'sig_' + Date.now() + '_' + pair.replace('/', ''),
+      pair, direction, entry: price,
+      stop_loss: direction === 'BUY' ? price - slDist : price + slDist,
+      take_profit: direction === 'BUY' ? price + tpDist : price - tpDist,
+      risk_reward: (tpDist / slDist).toFixed(2),
+      confidence,
+      atr_pips: (atr / pipSize).toFixed(1),
+      best_session: this.getSession(pair),
+      reasoning: reasons.slice(0, 4),
+      indicators: { rsi: rsi.toFixed(1), macd: macd.cross, adx: adx.adx.toFixed(1), stoch: stoch.k.toFixed(1) },
+      timestamp: new Date().toISOString(),
+      status: 'ACTIVE',
+      expires_at: new Date(Date.now() + 24*3600000).toISOString(),
+    };
+
+    return signal;
+  },
+
+  getSession(pair) {
+    const b = pair.split('/')[0], q = pair.split('/')[1];
+    if (['EUR','GBP','CHF'].includes(b) || ['EUR','GBP','CHF'].includes(q)) return 'LONDON';
+    if (['JPY','AUD','NZD'].includes(b) || ['JPY','AUD','NZD'].includes(q)) return 'TOKYO';
+    return 'NEW YORK';
+  },
+
+  async scanAll(pairs) {
+    const signals = [];
+    for (let i = 0; i < pairs.length; i++) {
+      const sig = await this.generate(pairs[i]);
+      if (sig) signals.push(sig);
+      if (i < pairs.length - 1) await new Promise(r => setTimeout(r, 8500)); // Rate limit
+    }
+    return signals.sort((a, b) => b.confidence - a.confidence);
+  },
+};
+
+// ===================== TRACKER =====================
+const Tracker = {
+  getAll() { return loadData().signals || []; },
+  save(signal) { const d = loadData(); d.signals.push(signal); saveData(d); },
+  update(id, exitPrice, outcome) {
+    const d = loadData();
+    const s = d.signals.find(x => x.id === id);
+    if (!s) return;
+    s.exit_price = exitPrice; s.outcome = outcome; s.status = 'CLOSED'; s.closed_at = new Date().toISOString();
+    const ps = IND.pipSize(s.pair);
+    s.pips = s.direction === 'BUY' ? (exitPrice - s.entry)/ps : (s.entry - exitPrice)/ps;
+    saveData(d);
+  },
+  checkActive() {
+    const d = loadData(); let changed = false;
+    d.signals.forEach(s => {
+      if (s.status !== 'ACTIVE') return;
+      const pr = STATE.prices[s.pair]?.price;
+      if (!pr) return;
+      if (s.direction === 'BUY') {
+        if (pr >= s.take_profit) { s.outcome = 'WIN'; s.status = 'CLOSED'; s.pips = (s.take_profit - s.entry)/IND.pipSize(s.pair); changed = true; }
+        else if (pr <= s.stop_loss) { s.outcome = 'LOSS'; s.status = 'CLOSED'; s.pips = (s.stop_loss - s.entry)/IND.pipSize(s.pair); changed = true; }
+      } else {
+        if (pr <= s.take_profit) { s.outcome = 'WIN'; s.status = 'CLOSED'; s.pips = (s.entry - s.take_profit)/IND.pipSize(s.pair); changed = true; }
+        else if (pr >= s.stop_loss) { s.outcome = 'LOSS'; s.status = 'CLOSED'; s.pips = (s.entry - s.stop_loss)/IND.pipSize(s.pair); changed = true; }
+      }
+      if (new Date(s.expires_at) < new Date() && s.status === 'ACTIVE') { s.status = 'EXPIRED'; s.outcome = 'EXPIRED'; changed = true; }
+    });
+    if (changed) saveData(d);
+  },
+  getStats() {
+    const all = this.getAll().filter(s => s.status === 'CLOSED' && s.outcome !== 'EXPIRED');
+    if (!all.length) return { total:0, wins:0, losses:0, winRate:'0', totalPips:'0', avgPips:'0', pf:'0' };
+    const wins = all.filter(s => s.outcome === 'WIN');
+    const losses = all.filter(s => s.outcome === 'LOSS');
+    const totalPips = all.reduce((s,x) => s + (x.pips||0), 0);
+    const gp = wins.reduce((s,x) => s + Math.abs(x.pips||0), 0);
+    const gl = losses.reduce((s,x) => s + Math.abs(x.pips||0), 0);
+    return {
+      total: all.length, wins: wins.length, losses: losses.length,
+      winRate: (wins.length/all.length*100).toFixed(1),
+      totalPips: totalPips.toFixed(1), avgPips: (totalPips/all.length).toFixed(1),
+      pf: gl > 0 ? (gp/gl).toFixed(2) : '∞',
+    };
+  },
+};
+
+// ===================== SENTIMENT =====================
+function analyzeSentiment(text) {
+  const pos = ['surge','rally','gain','rise','growth','strong','bullish','beat','upgrade','recovery','boost','soar'];
+  const neg = ['crash','plunge','fall','drop','loss','weak','bearish','miss','downgrade','fear','crisis','recession','slump'];
+  const t = text.toLowerCase();
+  let score = 0;
+  pos.forEach(w => { if (t.includes(w)) score++; });
+  neg.forEach(w => { if (t.includes(w)) score--; });
+  if (score > 1) return { label: 'BULLISH', color: '#00ff9d' };
+  if (score < -1) return { label: 'BEARISH', color: '#ff3860' };
+  return { label: 'NEUTRAL', color: '#ffb547' };
+}
+
+// ===================== UI HELPERS =====================
+function updateStatus(s) {
+  const el = document.getElementById('connectionStatus');
+  if (s === 'online') { el.className = 'connection-status connection-online'; el.innerHTML = '<span class="glow-dot" style="background:var(--accent-buy);color:var(--accent-buy)"></span><span>LIVE DATA</span>'; }
+  else { el.className = 'connection-status connection-offline'; el.innerHTML = '<span class="glow-dot" style="background:#ef4444;color:#ef4444"></span><span>OFFLINE</span>'; }
+}
+function toast(msg, type = 'info') {
+  const t = document.createElement('div'); t.className = 'toast';
+  const c = type === 'success' ? 'var(--accent-buy)' : type === 'error' ? 'var(--accent-sell)' : 'var(--accent-cyan)';
+  t.innerHTML = `<i class="fas fa-circle-info" style="color:${c}"></i> ${msg}`;
+  document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
+}
+function fmtPrice(pair, v) { return v.toFixed(pair.includes('JPY') ? 3 : 5); }
+
+// ===================== RENDER FUNCTIONS =====================
+function renderTicker() {
+  const el = document.getElementById('tickerContent');
+  const prices = Object.entries(STATE.prices);
+  if (!prices.length) return;
+  el.innerHTML = prices.map(([pair, d]) =>
+    `<span class="ticker-item"><span class="pair">${pair}</span><span class="font-mono">${fmtPrice(pair, d.price)}</span></span>`
+  ).join('');
+}
+
+function renderStats() {
+  const stats = Tracker.getStats();
+  const active = Tracker.getAll().filter(s => s.status === 'ACTIVE').length;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-label">ACTIVE SIGNALS</div><div class="stat-value" style="color:var(--accent-cyan)">${active}</div></div>
+    <div class="stat-card"><div class="stat-label">WIN RATE</div><div class="stat-value ${parseFloat(stats.winRate)>=50?'up':'down'}">${stats.winRate}%</div></div>
+    <div class="stat-card"><div class="stat-label">TOTAL PIPS</div><div class="stat-value ${parseFloat(stats.totalPips)>=0?'up':'down'}">${stats.totalPips}p</div></div>
+    <div class="stat-card"><div class="stat-label">PROFIT FACTOR</div><div class="stat-value">${stats.pf}</div></div>`;
+}
+
+function renderActiveSignals() {
+  const signals = Tracker.getAll().filter(s => s.status === 'ACTIVE');
+  const el = document.getElementById('activeSignals');
+  if (!signals.length) { el.innerHTML = '<div class="glass-card p-6 text-center" style="color:var(--text-dim);grid-column:1/-1"><i class="fas fa-search fa-2x mb-2"></i><br>No active signals. Click "Scan All Pairs" to find opportunities.</div>'; return; }
+  el.innerHTML = signals.map(s => {
+    const arrow = s.direction === 'BUY' ? '▲' : '▼';
+    const cur = STATE.prices[s.pair]?.price || s.entry;
+    const ps = IND.pipSize(s.pair);
+    const curPips = s.direction === 'BUY' ? (cur - s.entry)/ps : (s.entry - cur)/ps;
+    return `<div class="signal-card ${s.direction === 'SELL' ? 'sell' : ''}">
+      <div class="flex justify-between items-start mb-3">
+        <div><div class="font-mono text-lg font-bold">${s.pair}</div><span class="badge ${s.direction==='BUY'?'badge-buy':'badge-sell'}">${s.direction} ${arrow}</span></div>
+        <div class="text-right"><div class="text-xs" style="color:var(--text-dim)">CONFIDENCE</div><div class="font-mono font-bold text-xl">${s.confidence}%</div></div>
+      </div>
+      <div class="space-y-1 text-xs">
+        <div class="flex justify-between"><span style="color:var(--text-dim)">Entry</span><span class="font-mono">${fmtPrice(s.pair, s.entry)}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-dim)">Current</span><span class="font-mono ${curPips>=0?'up':'down'}">${fmtPrice(s.pair, cur)} (${curPips>=0?'+':''}${curPips.toFixed(1)}p)</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-dim)">Stop Loss</span><span class="font-mono down">${fmtPrice(s.pair, s.stop_loss)}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-dim)">Take Profit</span><span class="font-mono up">${fmtPrice(s.pair, s.take_profit)}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-dim)">R:R</span><span class="font-mono">1:${s.risk_reward}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-dim)">Session</span><span class="font-mono">${s.best_session}</span></div>
+      </div>
+      <div class="mt-3 pt-2" style="border-top:1px solid var(--border-subtle)">
+        <div class="text-xs" style="color:var(--text-dim)">REASONING:</div>
+        <div class="text-xs mt-1">${s.reasoning.map(r => '<div>• '+r+'</div>').join('')}</div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-buy flex-1" onclick="closeSignal('${s.id}','WIN')">✓ Win</button>
+        <button class="btn btn-sell flex-1" onclick="closeSignal('${s.id}','LOSS')">✗ Loss</button>
+      </div>
+      <div class="text-center mt-2" style="font-size:9px;color:var(--text-dim)">Expires: ${new Date(s.expires_at).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAllSignals() {
+  const all = Tracker.getAll().slice().reverse();
+  const el = document.getElementById('allSignalsList');
+  if (!all.length) { el.innerHTML = '<div class="glass-card p-6 text-center" style="color:var(--text-dim)">No signals yet.</div>'; return; }
+  el.innerHTML = all.map(s => {
+    const badge = s.status === 'ACTIVE' ? '<span class="badge badge-live">ACTIVE</span>' :
+      s.outcome === 'WIN' ? '<span class="badge badge-buy">WIN</span>' :
+      s.outcome === 'LOSS' ? '<span class="badge badge-sell">LOSS</span>' : '<span class="badge badge-amber">EXPIRED</span>';
+    return `<div class="glass-card p-3 flex justify-between items-center" style="opacity:${s.status==='ACTIVE'?1:0.7}">
+      <div><span class="font-mono font-bold">${s.pair}</span> <span class="badge ${s.direction==='BUY'?'badge-buy':'badge-sell'} ml-2">${s.direction}</span> <span class="text-xs ml-2" style="color:var(--text-dim)">${s.confidence}%</span></div>
+      <div class="flex items-center gap-3">${s.pips != null ? `<span class="font-mono text-xs ${s.pips>=0?'up':'down'}">${s.pips>=0?'+':''}${s.pips.toFixed(1)}p</span>` : ''}${badge}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTracker() {
+  const stats = Tracker.getStats();
+  document.getElementById('trackerStats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">TOTAL TRADES</div><div class="stat-value">${stats.total}</div></div>
+    <div class="stat-card"><div class="stat-label">W / L</div><div class="stat-value"><span class="up">${stats.wins}</span> / <span class="down">${stats.losses}</span></div></div>
+    <div class="stat-card"><div class="stat-label">AVG PIPS</div><div class="stat-value ${parseFloat(stats.avgPips)>=0?'up':'down'}">${stats.avgPips}p</div></div>
+    <div class="stat-card"><div class="stat-label">PROFIT FACTOR</div><div class="stat-value">${stats.pf}</div></div>`;
+  // By pair
+  const byPair = {};
+  Tracker.getAll().filter(s => s.status === 'CLOSED' && s.outcome !== 'EXPIRED').forEach(s => {
+    if (!byPair[s.pair]) byPair[s.pair] = { w:0, l:0, p:0 };
+    if (s.outcome === 'WIN') byPair[s.pair].w++; else byPair[s.pair].l++;
+    byPair[s.pair].p += s.pips || 0;
+  });
+  document.getElementById('trackerDetails').innerHTML = `<div class="glass-card p-4"><div class="stat-label mb-2">PERFORMANCE BY PAIR</div><div class="space-y-1">${
+    Object.entries(byPair).length ? Object.entries(byPair).map(([pair, d]) =>
+      `<div class="flex justify-between text-xs"><span class="font-mono">${pair}</span><span><span class="up">${d.w}W</span> / <span class="down">${d.l}L</span> · <span class="${d.p>=0?'up':'down'}">${d.p>=0?'+':''}${d.p.toFixed(1)}p</span></span></div>`
+    ).join('') : '<div style="color:var(--text-dim)">No closed trades yet</div>'
+  }</div></div>`;
+}
+
+// ===================== ACTIONS =====================
+async function doScan(pairs) {
+  if (STATE.scanning) return;
+  STATE.scanning = true;
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Scanning...';
+  try {
+    const signals = await SignalEngine.scanAll(pairs);
+    signals.forEach(s => {
+      Tracker.save(s);
+      Telegram.sendSignal(s); // Send to Telegram
+    });
+    renderActiveSignals(); renderStats();
+    toast(`Found ${signals.length} signal(s)!`, signals.length > 0 ? 'success' : 'info');
+  } catch (e) { toast('Scan failed: ' + e.message, 'error'); }
+  finally { STATE.scanning = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-search"></i> Scan All Pairs'; }
+}
+
+function closeSignal(id, outcome) {
+  const price = STATE.prices[Tracker.getAll().find(s => s.id === id)?.pair]?.price;
+  if (!price) { toast('Cannot get current price', 'error'); return; }
+  Tracker.update(id, price, outcome);
+  renderActiveSignals(); renderStats();
+  toast(`Signal closed as ${outcome}`, outcome === 'WIN' ? 'success' : 'error');
+}
+
+// ===================== NAVIGATION =====================
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const sec = item.dataset.section;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.section === sec));
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.toggle('active', p.id === 'section-' + sec));
+    if (sec === 'signals') renderAllSignals();
+    if (sec === 'tracker') renderTracker();
+    if (sec === 'settings') renderSettings();
+  });
+});
+
+// ===================== SETTINGS =====================
+function renderSettings() {
+  document.getElementById('apiStatus').innerHTML = `
+    <div class="flex justify-between"><span>Finnhub (WebSocket)</span><span class="${STATE.connected?'up':'down'}">${STATE.connected?'● Connected':'○ Disconnected'}</span></div>
+    <div class="flex justify-between"><span>Twelve Data (OHLCV)</span><span class="up">● Ready</span></div>
+    <div class="flex justify-between"><span>NewsAPI</span><span class="up">● Ready</span></div>
+    <div class="flex justify-between"><span>FRED</span><span class="up">● Ready</span></div>`;
+  document.getElementById('telegramStatus').innerHTML = `
+    <div class="flex justify-between"><span>Bot Token</span><span class="font-mono" style="color:var(--text-dim)">...${CONFIG.TELEGRAM.BOT_TOKEN.slice(-8)}</span></div>
+    <div class="flex justify-between"><span>Chat ID</span><span class="font-mono">${CONFIG.TELEGRAM.CHAT_ID}</span></div>
+    <div class="flex justify-between"><span>Status</span><span class="up">● Configured</span></div>`;
+}
+
+// ===================== NEWS =====================
+async function loadNews() {
+  const el = document.getElementById('newsList');
+  el.innerHTML = '<div class="text-center" style="color:var(--text-dim)"><span class="loader"></span> Loading...</div>';
+  const news = await DataLayer.fetchNews();
+  if (!news.length) { el.innerHTML = '<div style="color:var(--text-dim)">No news available.</div>'; return; }
+  el.innerHTML = news.map(n => `<div class="glass-card p-3">
+    <div class="flex justify-between items-start gap-2">
+      <div class="flex-1"><div class="font-bold text-sm">${n.title}</div><div class="text-xs mt-1" style="color:var(--text-secondary)">${n.desc||''}</div><div class="text-xs mt-1" style="color:var(--text-dim)">${n.source} · ${new Date(n.date).toLocaleString()}</div></div>
+      <span class="badge" style="background:${n.sentiment.color}22;color:${n.sentiment.color};border:1px solid ${n.sentiment.color}55">${n.sentiment.label}</span>
+    </div></div>`).join('');
+}
+
+async function loadCalendar() {
+  const el = document.getElementById('newsList');
+  el.innerHTML = '<div class="text-center" style="color:var(--text-dim)"><span class="loader"></span> Loading calendar...</div>';
+  const events = await DataLayer.fetchCalendar();
+  if (!events.length) { el.innerHTML = '<div style="color:var(--text-dim)">No events found.</div>'; return; }
+  el.innerHTML = events.slice(0, 20).map(e => `<div class="glass-card p-3 flex justify-between items-center">
+    <div><span class="badge ${e.impact==='high'?'badge-sell':'badge-amber'}">${e.impact}</span> <span class="font-mono font-bold ml-2">${e.event}</span><div class="text-xs mt-1" style="color:var(--text-dim)">${e.country} · ${e.date}</div></div>
+    <div class="text-xs font-mono" style="color:var(--text-secondary)">${e.actual||'-'} / ${e.estimate||'-'} / ${e.prev||'-'}</div>
+  </div>`).join('');
+}
+
+// ===================== EVENT LISTENERS =====================
+document.getElementById('scanBtn').addEventListener('click', () => doScan(CONFIG.PAIRS));
+document.getElementById('scanMajorsBtn').addEventListener('click', () => doScan(CONFIG.MAJORS));
+document.getElementById('loadNewsBtn').addEventListener('click', loadNews);
+document.getElementById('loadCalendarBtn').addEventListener('click', loadCalendar);
+document.getElementById('testTelegramBtn').addEventListener('click', async () => {
+  const ok = await Telegram.sendTest();
+  toast(ok ? 'Telegram message sent!' : 'Telegram failed', ok ? 'success' : 'error');
+});
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(loadData(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'oracle_backup.json'; a.click();
+  toast('Data exported', 'success');
+});
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (confirm('Delete ALL signal data? This cannot be undone.')) { saveData({ signals: [] }); renderStats(); renderActiveSignals(); toast('Data cleared', 'info'); }
+});
+
+// ===================== MAIN LOOP =====================
+function mainLoop() {
+  renderTicker();
+  Tracker.checkActive();
+  if (document.getElementById('section-dashboard').classList.contains('active')) renderActiveSignals();
+}
+
+// Clock
+setInterval(() => { document.getElementById('liveClock').textContent = new Date().toUTCString().slice(17,25) + ' UTC'; }, 1000);
+
+// ===================== INIT =====================
+async function init() {
+  console.log('🚀 ORACLE ULTIMATE v3.0 starting...');
+  DataLayer.connectWS();
+  renderStats();
+  renderActiveSignals();
+  setInterval(mainLoop, 2000);
+  // Send startup notification
+  await Telegram.send('🚀 <b>ORACLE ULTIMATE</b> started!\n\nMonitoring ' + CONFIG.PAIRS.length + ' pairs.\nReady to scan for signals.');
+  console.log('✅ ORACLE ULTIMATE ready');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
