@@ -129,9 +129,9 @@
       }
     },
     {
-      "generatedAt": "2026-10-18T04:24:22.089Z",
-      "period": "weekly",
-      "start": "2026-10-18T00:00:00.000Z",
+      "generatedAt": "2026-10-25T04:26:59.288Z",
+      "period": "daily",
+      "start": "2026-10-25T00:00:00.000Z",
       "signals": 0,
       "health": {
         "total": 0,
@@ -254,8 +254,8 @@
       }
     },
     {
-      "generatedAt": "2026-10-25T04:26:59.288Z",
-      "period": "daily",
+      "generatedAt": "2026-10-25T04:34:20.231Z",
+      "period": "weekly",
       "start": "2026-10-25T00:00:00.000Z",
       "signals": 0,
       "health": {
